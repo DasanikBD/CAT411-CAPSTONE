@@ -1,0 +1,9 @@
+Metric,Value,Threshold,Pass
+Overall Accuracy,0.840,≥ 0.60,True
+Mean Residual (|bias|),0.040,|bias| < 0.50,True
+RMSE (ordinal),0.529,RMSE < 1.50,True
+Recall — None,0.907,≥ 0.30 (informational),True
+Recall — Slight,1.000,≥ 0.30 (informational),True
+Recall — Moderate,0.250,≥ 0.30 (informational),False
+Recall — Extensive,0.500,≥ 0.30 (informational),True
+Recall — Complete,0.000,≥ 0.30 (informational),False
