@@ -152,9 +152,12 @@ PLOT_BG = dict(
     plot_bgcolor="rgba(30,41,59,0.6)",
     font=dict(color="#E2E8F0", family="Inter, sans-serif"),
     title_font=dict(color="#F1F5F9", size=16),
-    legend=dict(bgcolor="rgba(15,23,42,0.8)", bordercolor="#1C7293", borderwidth=1),
-    xaxis=dict(gridcolor="#1E3A5F", linecolor="#1C7293", tickcolor="#94A3B8"),
-    yaxis=dict(gridcolor="#1E3A5F", linecolor="#1C7293", tickcolor="#94A3B8"),
+    xaxis_gridcolor="#1E3A5F",
+    xaxis_linecolor="#1C7293",
+    xaxis_tickcolor="#94A3B8",
+    yaxis_gridcolor="#1E3A5F",
+    yaxis_linecolor="#1C7293",
+    yaxis_tickcolor="#94A3B8",
 )
 
 # ── Load data ──────────────────────────────────────────────────
