@@ -403,9 +403,10 @@ f1, f2, f3 = st.columns(3)
 ds_filter  = f1.multiselect("Filter by Damage State",
                              [d.capitalize() for d in DS_ORDER],
                              default=[d.capitalize() for d in DS_ORDER])
+hwb_options = sorted(active['hwb_class'].dropna().unique())
 hwb_filter = f2.multiselect("Filter by HWB Class",
-                              sorted(active['hwb_class'].unique()),
-                              default=sorted(active['hwb_class'].unique()))
+                              hwb_options,
+                              default=hwb_options)
 min_cost   = f3.number_input("Min Repair Cost ($)", min_value=0, value=0, step=10000)
 
 filtered = active[
