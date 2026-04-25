@@ -147,16 +147,14 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ── Plotly dark template ────────────────────────────────────────
-PLOT_TEMPLATE = dict(
-    layout=dict(
-        paper_bgcolor="rgba(15,23,42,0)",
-        plot_bgcolor="rgba(30,41,59,0.6)",
-        font=dict(color="#E2E8F0", family="Inter, sans-serif"),
-        title_font=dict(color="#F1F5F9", size=16),
-        legend=dict(bgcolor="rgba(15,23,42,0.8)", bordercolor="#1C7293", borderwidth=1),
-        xaxis=dict(gridcolor="#1E3A5F", linecolor="#1C7293", tickcolor="#94A3B8"),
-        yaxis=dict(gridcolor="#1E3A5F", linecolor="#1C7293", tickcolor="#94A3B8"),
-    )
+PLOT_BG = dict(
+    paper_bgcolor="rgba(15,23,42,0)",
+    plot_bgcolor="rgba(30,41,59,0.6)",
+    font=dict(color="#E2E8F0", family="Inter, sans-serif"),
+    title_font=dict(color="#F1F5F9", size=16),
+    legend=dict(bgcolor="rgba(15,23,42,0.8)", bordercolor="#1C7293", borderwidth=1),
+    xaxis=dict(gridcolor="#1E3A5F", linecolor="#1C7293", tickcolor="#94A3B8"),
+    yaxis=dict(gridcolor="#1E3A5F", linecolor="#1C7293", tickcolor="#94A3B8"),
 )
 
 # ── Load data ──────────────────────────────────────────────────
@@ -205,7 +203,7 @@ with st.sidebar:
     <div style='background:rgba(6,90,130,0.3); border:1px solid #1C7293; 
                 border-radius:8px; padding:10px; font-size:0.9rem;'>
         k = 2.07 &nbsp;·&nbsp; β = 0.20<br>
-        <span style='color:#94A3B8; font-size:0.8rem;'>Calibrated · Sirisha Kedarsetty</span>
+        <span style='color:#94A3B8; font-size:0.8rem;'>Calibrated parameters</span>
     </div>
     """, unsafe_allow_html=True)
 
@@ -334,7 +332,7 @@ with col_dist:
         marker_line_color="#0EA5E9", marker_line_width=1
     ))
     fig_dist.update_layout(
-        **PLOT_TEMPLATE["layout"],
+        **PLOT_BG,
         barmode="group", height=210,
         yaxis_title="% of Bridges",
         legend=dict(orientation="h", y=1.12, bgcolor="rgba(0,0,0,0)",
@@ -354,7 +352,7 @@ with col_dist:
         textposition="outside", textfont=dict(color="#E2E8F0", size=11)
     ))
     fig_cost.update_layout(
-        **PLOT_TEMPLATE["layout"],
+        **PLOT_BG,
         height=200, yaxis_title="Repair Cost ($M)",
         margin=dict(t=10,b=40,l=50,r=10), showlegend=False
     )
@@ -388,7 +386,7 @@ with col_scatter:
         template="plotly_dark"
     )
     fig_sc.update_layout(
-        **PLOT_TEMPLATE["layout"],
+        **PLOT_BG,
         margin=dict(t=10,b=40,l=60,r=10),
         legend_title_text="Damage State"
     )
