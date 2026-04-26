@@ -18,12 +18,155 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# ── Background bridge animation ───────────────────────────────
+BRIDGE_BG = """
+<div id="bridge-bg" style="
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -999; overflow: hidden; pointer-events: none;">
+  <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" 
+       viewBox="0 0 1440 800" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" style="stop-color:#0F172A;stop-opacity:1"/>
+        <stop offset="100%" style="stop-color:#1E293B;stop-opacity:1"/>
+      </linearGradient>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+        <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <style>
+        @keyframes sway {
+          0%,100% { transform: translateY(0px); }
+          50%      { transform: translateY(-4px); }
+        }
+        @keyframes shimmer {
+          0%,100% { opacity: 0.15; }
+          50%      { opacity: 0.3; }
+        }
+        @keyframes scan {
+          0%   { transform: translateX(-200px); opacity: 0; }
+          10%  { opacity: 0.4; }
+          90%  { opacity: 0.4; }
+          100% { transform: translateX(1600px); opacity: 0; }
+        }
+        .cable { animation: sway 6s ease-in-out infinite; }
+        .tower { animation: shimmer 4s ease-in-out infinite; }
+        .scan-line { animation: scan 12s linear infinite; }
+      </style>
+    </defs>
+
+    <!-- Sky background -->
+    <rect width="1440" height="800" fill="url(#skyGrad)" opacity="0.98"/>
+
+    <!-- Stars -->
+    <g opacity="0.4">
+      <circle cx="100" cy="80"  r="1" fill="#E2E8F0"/>
+      <circle cx="250" cy="50"  r="1.5" fill="#E2E8F0"/>
+      <circle cx="400" cy="120" r="1" fill="#E2E8F0"/>
+      <circle cx="600" cy="40"  r="1.2" fill="#E2E8F0"/>
+      <circle cx="800" cy="90"  r="1" fill="#E2E8F0"/>
+      <circle cx="1000" cy="60" r="1.5" fill="#E2E8F0"/>
+      <circle cx="1200" cy="110" r="1" fill="#E2E8F0"/>
+      <circle cx="1350" cy="45" r="1.2" fill="#E2E8F0"/>
+      <circle cx="180" cy="160" r="1" fill="#94A3B8"/>
+      <circle cx="500" cy="200" r="0.8" fill="#94A3B8"/>
+      <circle cx="900" cy="170" r="1" fill="#94A3B8"/>
+      <circle cx="1100" cy="140" r="0.8" fill="#94A3B8"/>
+    </g>
+
+    <!-- Water reflection -->
+    <rect x="0" y="620" width="1440" height="180" 
+          fill="#0F172A" opacity="0.9"/>
+    <g opacity="0.08">
+      <path d="M0,640 Q360,650 720,640 Q1080,630 1440,640" 
+            stroke="#38BDF8" stroke-width="1" fill="none"/>
+      <path d="M0,660 Q360,670 720,660 Q1080,650 1440,660" 
+            stroke="#38BDF8" stroke-width="0.8" fill="none"/>
+      <path d="M0,680 Q360,690 720,680 Q1080,670 1440,680" 
+            stroke="#38BDF8" stroke-width="0.6" fill="none"/>
+    </g>
+
+    <!-- Bridge deck -->
+    <rect x="0" y="580" width="1440" height="12" fill="#1E293B" opacity="0.8"/>
+    <rect x="0" y="590" width="1440" height="3"  fill="#065A82" opacity="0.5"/>
+
+    <!-- Left tower -->
+    <g class="tower" filter="url(#glow)">
+      <rect x="295" y="320" width="18" height="270" fill="#1C7293" opacity="0.35"/>
+      <rect x="303" y="300" width="3"  height="290" fill="#38BDF8" opacity="0.15"/>
+      <rect x="270" y="440" width="70" height="8"   fill="#1C7293" opacity="0.3"/>
+      <rect x="270" y="480" width="70" height="8"   fill="#1C7293" opacity="0.3"/>
+      <!-- Tower top light -->
+      <circle cx="304" cy="315" r="4" fill="#38BDF8" opacity="0.6"/>
+      <circle cx="304" cy="315" r="8" fill="#38BDF8" opacity="0.15"/>
+    </g>
+
+    <!-- Right tower -->
+    <g class="tower" filter="url(#glow)" style="animation-delay:2s">
+      <rect x="1127" y="320" width="18" height="270" fill="#1C7293" opacity="0.35"/>
+      <rect x="1135" y="300" width="3"  height="290" fill="#38BDF8" opacity="0.15"/>
+      <rect x="1102" y="440" width="70" height="8"   fill="#1C7293" opacity="0.3"/>
+      <rect x="1102" y="480" width="70" height="8"   fill="#1C7293" opacity="0.3"/>
+      <circle cx="1136" cy="315" r="4" fill="#38BDF8" opacity="0.6"/>
+      <circle cx="1136" cy="315" r="8" fill="#38BDF8" opacity="0.15"/>
+    </g>
+
+    <!-- Main cables -->
+    <g class="cable" opacity="0.3">
+      <path d="M0,560 Q304,300 720,420 Q1136,300 1440,560"
+            stroke="#38BDF8" stroke-width="2" fill="none"/>
+      <path d="M0,565 Q304,305 720,425 Q1136,305 1440,565"
+            stroke="#065A82" stroke-width="1" fill="none"/>
+    </g>
+
+    <!-- Vertical suspender cables -->
+    <g opacity="0.12" stroke="#38BDF8" stroke-width="0.8">
+      <line x1="200" y1="515" x2="200" y2="582"/>
+      <line x1="250" y1="490" x2="250" y2="582"/>
+      <line x1="304" y1="440" x2="304" y2="582"/>
+      <line x1="360" y1="455" x2="360" y2="582"/>
+      <line x1="420" y1="465" x2="420" y2="582"/>
+      <line x1="480" y1="472" x2="480" y2="582"/>
+      <line x1="540" y1="477" x2="540" y2="582"/>
+      <line x1="600" y1="478" x2="600" y2="582"/>
+      <line x1="660" y1="477" x2="660" y2="582"/>
+      <line x1="720" y1="420" x2="720" y2="582"/>
+      <line x1="780" y1="477" x2="780" y2="582"/>
+      <line x1="840" y1="478" x2="840" y2="582"/>
+      <line x1="900" y1="477" x2="900" y2="582"/>
+      <line x1="960" y1="472" x2="960" y2="582"/>
+      <line x1="1020" y1="465" x2="1020" y2="582"/>
+      <line x1="1080" y1="455" x2="1080" y2="582"/>
+      <line x1="1136" y1="440" x2="1136" y2="582"/>
+      <line x1="1190" y1="490" x2="1190" y2="582"/>
+      <line x1="1240" y1="515" x2="1240" y2="582"/>
+    </g>
+
+    <!-- Scan line effect -->
+    <rect class="scan-line" x="-200" y="0" width="150" height="800"
+          fill="url(#skyGrad)" opacity="0.05"
+          style="animation-delay:3s"/>
+
+    <!-- Corner text watermark -->
+    <text x="30" y="780" font-family="monospace" font-size="11" 
+          fill="#1C7293" opacity="0.4">
+      NORTHRIDGE 1994 · 2,008 BRIDGES · LOSS ASSESSMENT
+    </text>
+  </svg>
+</div>
+"""
+
 # ── Custom CSS ─────────────────────────────────────────────────
 st.markdown("""
 <style>
-    /* Main background */
+    /* Animated background */
     .stApp {
-        background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+        background: 
+            linear-gradient(135deg, rgba(15,23,42,0.97) 0%, rgba(30,41,59,0.95) 50%, rgba(15,23,42,0.97) 100%),
+            url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/GoldenGateBridge-001.jpg/1280px-GoldenGateBridge-001.jpg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
         color: #E2E8F0;
     }
 
@@ -108,6 +251,24 @@ st.markdown("""
     /* Caption / footer text */
     .stCaption { color: #475569 !important; }
 
+    /* Background video overlay */
+    #bg-video-container {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: -1;
+        overflow: hidden;
+    }
+    #bg-video-container video {
+        min-width: 100%; min-height: 100%;
+        width: auto; height: auto;
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0.08;
+        filter: grayscale(80%) brightness(0.4);
+    }
+
     /* Info boxes */
     .stAlert {
         background: #1E293B !important;
@@ -146,19 +307,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ── Plotly dark template ────────────────────────────────────────
-PLOT_BG = dict(
-    paper_bgcolor="rgba(15,23,42,0)",
-    plot_bgcolor="rgba(30,41,59,0.6)",
-    font=dict(color="#E2E8F0", family="Inter, sans-serif"),
-    title_font=dict(color="#F1F5F9", size=16),
-    xaxis_gridcolor="#1E3A5F",
-    xaxis_linecolor="#1C7293",
-    xaxis_tickcolor="#94A3B8",
-    yaxis_gridcolor="#1E3A5F",
-    yaxis_linecolor="#1C7293",
-    yaxis_tickcolor="#94A3B8",
-)
+# Plotly settings inlined per chart
 
 # ── Load data ──────────────────────────────────────────────────
 @st.cache_data
@@ -169,6 +318,9 @@ def load_data():
     return sm, gmpe
 
 sm_df, gmpe_df = load_data()
+
+# Inject bridge background
+st.markdown(BRIDGE_BG, unsafe_allow_html=True)
 
 # ── Colour map ──────────────────────────────────────────────────
 DS_COLORS = {
@@ -205,8 +357,8 @@ with st.sidebar:
     st.markdown("""
     <div style='background:rgba(6,90,130,0.3); border:1px solid #1C7293; 
                 border-radius:8px; padding:10px; font-size:0.9rem;'>
-        k = 2.07 &nbsp;·&nbsp; β = 0.20<br>
-        <span style='color:#94A3B8; font-size:0.8rem;'>Calibrated parameters</span>
+        k = 2.07 &nbsp;·&nbsp; Calibrated<br>
+        <span style='color:#94A3B8; font-size:0.8rem;'>HAZUS lognormal fragility model</span>
     </div>
     """, unsafe_allow_html=True)
 
@@ -256,7 +408,7 @@ st.markdown(f"""
     </h1>
     <p style='color:#64748B; margin:4px 0 0 0; font-size:0.9rem;'>
         Northridge 1994 Earthquake &nbsp;·&nbsp; {len(active):,} bridges &nbsp;·&nbsp; 
-        Calibrated HAZUS fragility (k=2.07, β=0.20)
+        Calibrated HAZUS fragility (k=2.07)
     </p>
 </div>
 <hr style='border-color:#1C7293; opacity:0.3; margin:0.8rem 0;'/>
@@ -335,9 +487,13 @@ with col_dist:
         marker_line_color="#0EA5E9", marker_line_width=1
     ))
     fig_dist.update_layout(
-        **PLOT_BG,
+        paper_bgcolor="rgba(15,23,42,0)",
+        plot_bgcolor="rgba(30,41,59,0.6)",
+        font=dict(color="#E2E8F0"),
         barmode="group", height=210,
         yaxis_title="% of Bridges",
+        xaxis_gridcolor="#1E3A5F",
+        yaxis_gridcolor="#1E3A5F",
         legend=dict(orientation="h", y=1.12, bgcolor="rgba(0,0,0,0)",
                     font=dict(color="#E2E8F0")),
         margin=dict(t=10,b=40,l=50,r=10)
@@ -355,8 +511,12 @@ with col_dist:
         textposition="outside", textfont=dict(color="#E2E8F0", size=11)
     ))
     fig_cost.update_layout(
-        **PLOT_BG,
+        paper_bgcolor="rgba(15,23,42,0)",
+        plot_bgcolor="rgba(30,41,59,0.6)",
+        font=dict(color="#E2E8F0"),
         height=200, yaxis_title="Repair Cost ($M)",
+        xaxis_gridcolor="#1E3A5F",
+        yaxis_gridcolor="#1E3A5F",
         margin=dict(t=10,b=40,l=50,r=10), showlegend=False
     )
     st.plotly_chart(fig_cost, use_container_width=True)
@@ -389,7 +549,11 @@ with col_scatter:
         template="plotly_dark"
     )
     fig_sc.update_layout(
-        **PLOT_BG,
+        paper_bgcolor="rgba(15,23,42,0)",
+        plot_bgcolor="rgba(30,41,59,0.6)",
+        font=dict(color="#E2E8F0"),
+        xaxis_gridcolor="#1E3A5F",
+        yaxis_gridcolor="#1E3A5F",
         margin=dict(t=10,b=40,l=60,r=10),
         legend_title_text="Damage State"
     )
@@ -416,7 +580,7 @@ filtered = active[
 ].copy()
 
 show_cols = ['structure_number','latitude','longitude','year_built',
-             'hwb_class','material','sa1s_display',
+             'hwb_class','sa1s_display',
              'predicted_ds','replacement_cost_usd','repair_cost_usd','obs']
 col_labels = {'structure_number':'Bridge ID','sa1s_display':hazard_label,
               'predicted_ds':'Pred. DS','replacement_cost_usd':'RCV ($)',
@@ -439,7 +603,7 @@ st.markdown("""
 <hr style='border-color:#1C7293; opacity:0.2; margin-top:2rem;'/>
 <div style='text-align:center; color:#334155; font-size:0.78rem; padding:0.5rem 0;'>
     CAT411 Catastrophe Modeling Capstone &nbsp;·&nbsp; Lehigh University &nbsp;·&nbsp;
-    Calibrated HAZUS fragility (k=2.07, β=0.20) &nbsp;·&nbsp;
+    Calibrated HAZUS fragility (k=2.07) &nbsp;·&nbsp;
     GMPE: Kubilay Albayrak &nbsp;·&nbsp; RCV: Wenyu Chiou &nbsp;·&nbsp;
     Calibration: Sirisha Kedarsetty &nbsp;·&nbsp; Dashboard: Anik Das
 </div>
