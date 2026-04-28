@@ -84,27 +84,40 @@ BRIDGE_BG = """
 </div>
 """
 
-st.markdown("""
+# ── Load background image as base64 ───────────────────────────
+import base64
+def get_bg_image():
+    try:
+        img_path = Path(__file__).parent / "bridge_bg.jpg"
+        with open(img_path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
+    except:
+        return None
+
+bg_b64 = get_bg_image()
+bg_css = f"url('data:image/jpeg;base64,{bg_b64}')" if bg_b64 else "none"
+
+st.markdown(f"""
 <style>
-    .stApp { 
+    .stApp {{ 
         background: 
             linear-gradient(135deg, rgba(15,23,42,0.82) 0%, rgba(30,41,59,0.80) 50%, rgba(15,23,42,0.82) 100%),
-            url('./assets/bridge_bg.jpg');
+            {bg_css};
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
         color: #E2E8F0; 
-    }
-    [data-testid="stSidebar"] { background: linear-gradient(180deg, #065A82 0%, #021B2E 100%); border-right: 1px solid #1C7293; }
-    [data-testid="stSidebar"] * { color: #E2E8F0 !important; }
-    [data-testid="metric-container"] { background: linear-gradient(135deg, #1E293B, #0F2744); border: 1px solid #1C7293; border-radius: 12px; padding: 16px; }
-    [data-testid="metric-container"] label { color: #94A3B8 !important; font-size: 0.85rem !important; font-weight: 600 !important; text-transform: uppercase !important; }
-    [data-testid="metric-container"] [data-testid="stMetricValue"] { color: #38BDF8 !important; font-size: 1.8rem !important; font-weight: 700 !important; }
-    h1 { color: #F1F5F9 !important; font-weight: 800 !important; }
-    h2 { color: #E2E8F0 !important; } h3 { color: #CBD5E1 !important; }
-    hr { border-color: #1C7293 !important; opacity: 0.4; }
-    .stTabs [data-baseweb="tab-list"] { background: #1E293B; border-radius: 8px; border: 1px solid #1C7293; }
-    .stTabs [aria-selected="true"] { color: #38BDF8 !important; background: #065A82 !important; border-radius: 6px !important; }
+    }}
+    [data-testid="stSidebar"] {{ background: linear-gradient(180deg, #065A82 0%, #021B2E 100%); border-right: 1px solid #1C7293; }}
+    [data-testid="stSidebar"] * {{ color: #E2E8F0 !important; }}
+    [data-testid="metric-container"] {{ background: linear-gradient(135deg, #1E293B, #0F2744); border: 1px solid #1C7293; border-radius: 12px; padding: 16px; }}
+    [data-testid="metric-container"] label {{ color: #94A3B8 !important; font-size: 0.85rem !important; font-weight: 600 !important; text-transform: uppercase !important; }}
+    [data-testid="metric-container"] [data-testid="stMetricValue"] {{ color: #38BDF8 !important; font-size: 1.8rem !important; font-weight: 700 !important; }}
+    h1 {{ color: #F1F5F9 !important; font-weight: 800 !important; }}
+    h2 {{ color: #E2E8F0 !important; }} h3 {{ color: #CBD5E1 !important; }}
+    hr {{ border-color: #1C7293 !important; opacity: 0.4; }}
+    .stTabs [data-baseweb="tab-list"] {{ background: #1E293B; border-radius: 8px; border: 1px solid #1C7293; }}
+    .stTabs [aria-selected="true"] {{ color: #38BDF8 !important; background: #065A82 !important; border-radius: 6px !important; }}
 </style>
 """, unsafe_allow_html=True)
 
