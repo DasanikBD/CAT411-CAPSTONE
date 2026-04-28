@@ -86,7 +86,7 @@ BRIDGE_BG = """
 
 st.markdown("""
 <style>
-    .stApp { background: linear-gradient(135deg, rgba(15,23,42,0.97) 0%, rgba(30,41,59,0.95) 50%, rgba(15,23,42,0.97) 100%); color: #E2E8F0; }
+    .stApp { background: linear-gradient(135deg, rgba(15,23,42,0.70) 0%, rgba(30,41,59,0.70) 50%, rgba(15,23,42,0.70) 100%); color: #E2E8F0; }
     [data-testid="stSidebar"] { background: linear-gradient(180deg, #065A82 0%, #021B2E 100%); border-right: 1px solid #1C7293; }
     [data-testid="stSidebar"] * { color: #E2E8F0 !important; }
     [data-testid="metric-container"] { background: linear-gradient(135deg, #1E293B, #0F2744); border: 1px solid #1C7293; border-radius: 12px; padding: 16px; }
@@ -197,13 +197,16 @@ st.markdown("<hr style='border-color:#1C7293; opacity:0.2;'/>", unsafe_allow_htm
 col_map, col_dist = st.columns([3, 2])
 
 with col_map:
-    # Toggle between standard and bull's-eye map
-    map_mode = st.radio(
-        "**Map View**",
-        ["📍 Predicted Damage", "🎯 Prediction vs Observed"],
-        horizontal=True,
-        key="map_toggle"
-    )
+    # Bull's-eye toggle only available for ShakeMap (has observed data)
+    if mode == "ShakeMap":
+        map_mode = st.radio(
+            "**Map View**",
+            ["📍 Predicted Damage", "🎯 Prediction vs Observed"],
+            horizontal=True,
+            key="map_toggle"
+        )
+    else:
+        map_mode = "📍 Predicted Damage"
 
     if map_mode == "📍 Predicted Damage":
         # ── Standard map (original) ───────────────────────────────
@@ -260,32 +263,44 @@ with col_map:
 
         fig_bull = go.Figure()
 
-        # Layer 1 — outer ring (mismatch type & magnitude)
-        for mtype in MISMATCH_ORDER:
-            sub = plot_df[plot_df["match_type"] == mtype]
+        # Layer 1 — matched bridges as tiny background dots (no rings)
+        matched = plot_df[plot_df["gap"] == 0]
+        fig_bull.add_trace(go.Scattermapbox(
+            lat=matched["latitude"], lon=matched["longitude"],
+            mode="markers",
+            marker=dict(size=4, color="#334155", opacity=0.35),
+            name="✅ Match",
+            hoverinfo="skip",
+            showlegend=True,
+        ))
+
+        # Layer 2 — mismatched bridges: outer ring (size = gap magnitude)
+        mismatched = plot_df[plot_df["gap"] != 0]
+        for mtype in ["🔺 Overpredicted", "🔻 Underpredicted"]:
+            sub = mismatched[mismatched["match_type"] == mtype]
             fig_bull.add_trace(go.Scattermapbox(
                 lat=sub["latitude"], lon=sub["longitude"],
                 mode="markers",
                 marker=dict(
                     size=sub["outer_size"],
                     color=MISMATCH_COLORS[mtype],
-                    opacity=0.40,
+                    opacity=0.35,
                 ),
                 name=mtype,
                 hoverinfo="skip",
                 showlegend=True,
             ))
 
-        # Layer 2 — inner dot (observed DS color)
-        for mtype in MISMATCH_ORDER:
-            sub = plot_df[plot_df["match_type"] == mtype]
+        # Layer 3 — inner dot for mismatched only (observed DS color)
+        for mtype in ["🔺 Overpredicted", "🔻 Underpredicted"]:
+            sub = mismatched[mismatched["match_type"] == mtype]
             fig_bull.add_trace(go.Scattermapbox(
                 lat=sub["latitude"], lon=sub["longitude"],
                 mode="markers",
                 marker=dict(
-                    size=6,
+                    size=7,
                     color=[DS_COLORS.get(d, "#64748B") for d in sub["obs_clean"]],
-                    opacity=0.95,
+                    opacity=1.0,
                 ),
                 customdata=sub[["structure_number","obs_clean","predicted_ds",
                                 "year_built","hwb_class","repair_cost_usd","gap"]].values,
