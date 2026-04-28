@@ -10,7 +10,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 from pathlib import Path
 
-# ── Page config ────────────────────────────────────────────────
 st.set_page_config(
     page_title="Bridge Loss Assessment — Northridge 1994",
     page_icon="🌉",
@@ -18,12 +17,11 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ── Background bridge animation ───────────────────────────────
 BRIDGE_BG = """
 <div id="bridge-bg" style="
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     z-index: -999; overflow: hidden; pointer-events: none;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" 
+  <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"
        viewBox="0 0 1440 800" preserveAspectRatio="xMidYMid slice">
     <defs>
       <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -35,279 +33,72 @@ BRIDGE_BG = """
         <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>
       <style>
-        @keyframes sway {
-          0%,100% { transform: translateY(0px); }
-          50%      { transform: translateY(-4px); }
-        }
-        @keyframes shimmer {
-          0%,100% { opacity: 0.15; }
-          50%      { opacity: 0.3; }
-        }
-        @keyframes scan {
-          0%   { transform: translateX(-200px); opacity: 0; }
-          10%  { opacity: 0.4; }
-          90%  { opacity: 0.4; }
-          100% { transform: translateX(1600px); opacity: 0; }
-        }
+        @keyframes sway { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-4px); } }
+        @keyframes shimmer { 0%,100% { opacity: 0.15; } 50% { opacity: 0.3; } }
+        @keyframes scan { 0% { transform: translateX(-200px); opacity: 0; } 10% { opacity: 0.4; } 90% { opacity: 0.4; } 100% { transform: translateX(1600px); opacity: 0; } }
         .cable { animation: sway 6s ease-in-out infinite; }
         .tower { animation: shimmer 4s ease-in-out infinite; }
         .scan-line { animation: scan 12s linear infinite; }
       </style>
     </defs>
-
-    <!-- Sky background -->
     <rect width="1440" height="800" fill="url(#skyGrad)" opacity="0.98"/>
-
-    <!-- Stars -->
     <g opacity="0.4">
-      <circle cx="100" cy="80"  r="1" fill="#E2E8F0"/>
-      <circle cx="250" cy="50"  r="1.5" fill="#E2E8F0"/>
+      <circle cx="100" cy="80" r="1" fill="#E2E8F0"/>
+      <circle cx="250" cy="50" r="1.5" fill="#E2E8F0"/>
       <circle cx="400" cy="120" r="1" fill="#E2E8F0"/>
-      <circle cx="600" cy="40"  r="1.2" fill="#E2E8F0"/>
-      <circle cx="800" cy="90"  r="1" fill="#E2E8F0"/>
+      <circle cx="600" cy="40" r="1.2" fill="#E2E8F0"/>
+      <circle cx="800" cy="90" r="1" fill="#E2E8F0"/>
       <circle cx="1000" cy="60" r="1.5" fill="#E2E8F0"/>
       <circle cx="1200" cy="110" r="1" fill="#E2E8F0"/>
       <circle cx="1350" cy="45" r="1.2" fill="#E2E8F0"/>
-      <circle cx="180" cy="160" r="1" fill="#94A3B8"/>
-      <circle cx="500" cy="200" r="0.8" fill="#94A3B8"/>
-      <circle cx="900" cy="170" r="1" fill="#94A3B8"/>
-      <circle cx="1100" cy="140" r="0.8" fill="#94A3B8"/>
     </g>
-
-    <!-- Water reflection -->
-    <rect x="0" y="620" width="1440" height="180" 
-          fill="#0F172A" opacity="0.9"/>
-    <g opacity="0.08">
-      <path d="M0,640 Q360,650 720,640 Q1080,630 1440,640" 
-            stroke="#38BDF8" stroke-width="1" fill="none"/>
-      <path d="M0,660 Q360,670 720,660 Q1080,650 1440,660" 
-            stroke="#38BDF8" stroke-width="0.8" fill="none"/>
-      <path d="M0,680 Q360,690 720,680 Q1080,670 1440,680" 
-            stroke="#38BDF8" stroke-width="0.6" fill="none"/>
-    </g>
-
-    <!-- Bridge deck -->
+    <rect x="0" y="620" width="1440" height="180" fill="#0F172A" opacity="0.9"/>
     <rect x="0" y="580" width="1440" height="12" fill="#1E293B" opacity="0.8"/>
-    <rect x="0" y="590" width="1440" height="3"  fill="#065A82" opacity="0.5"/>
-
-    <!-- Left tower -->
+    <rect x="0" y="590" width="1440" height="3" fill="#065A82" opacity="0.5"/>
     <g class="tower" filter="url(#glow)">
       <rect x="295" y="320" width="18" height="270" fill="#1C7293" opacity="0.35"/>
-      <rect x="303" y="300" width="3"  height="290" fill="#38BDF8" opacity="0.15"/>
-      <rect x="270" y="440" width="70" height="8"   fill="#1C7293" opacity="0.3"/>
-      <rect x="270" y="480" width="70" height="8"   fill="#1C7293" opacity="0.3"/>
-      <!-- Tower top light -->
+      <rect x="303" y="300" width="3" height="290" fill="#38BDF8" opacity="0.15"/>
+      <rect x="270" y="440" width="70" height="8" fill="#1C7293" opacity="0.3"/>
       <circle cx="304" cy="315" r="4" fill="#38BDF8" opacity="0.6"/>
       <circle cx="304" cy="315" r="8" fill="#38BDF8" opacity="0.15"/>
     </g>
-
-    <!-- Right tower -->
     <g class="tower" filter="url(#glow)" style="animation-delay:2s">
       <rect x="1127" y="320" width="18" height="270" fill="#1C7293" opacity="0.35"/>
-      <rect x="1135" y="300" width="3"  height="290" fill="#38BDF8" opacity="0.15"/>
-      <rect x="1102" y="440" width="70" height="8"   fill="#1C7293" opacity="0.3"/>
-      <rect x="1102" y="480" width="70" height="8"   fill="#1C7293" opacity="0.3"/>
+      <rect x="1135" y="300" width="3" height="290" fill="#38BDF8" opacity="0.15"/>
+      <rect x="1102" y="440" width="70" height="8" fill="#1C7293" opacity="0.3"/>
       <circle cx="1136" cy="315" r="4" fill="#38BDF8" opacity="0.6"/>
       <circle cx="1136" cy="315" r="8" fill="#38BDF8" opacity="0.15"/>
     </g>
-
-    <!-- Main cables -->
     <g class="cable" opacity="0.3">
-      <path d="M0,560 Q304,300 720,420 Q1136,300 1440,560"
-            stroke="#38BDF8" stroke-width="2" fill="none"/>
-      <path d="M0,565 Q304,305 720,425 Q1136,305 1440,565"
-            stroke="#065A82" stroke-width="1" fill="none"/>
+      <path d="M0,560 Q304,300 720,420 Q1136,300 1440,560" stroke="#38BDF8" stroke-width="2" fill="none"/>
     </g>
-
-    <!-- Vertical suspender cables -->
     <g opacity="0.12" stroke="#38BDF8" stroke-width="0.8">
-      <line x1="200" y1="515" x2="200" y2="582"/>
-      <line x1="250" y1="490" x2="250" y2="582"/>
       <line x1="304" y1="440" x2="304" y2="582"/>
-      <line x1="360" y1="455" x2="360" y2="582"/>
-      <line x1="420" y1="465" x2="420" y2="582"/>
-      <line x1="480" y1="472" x2="480" y2="582"/>
-      <line x1="540" y1="477" x2="540" y2="582"/>
-      <line x1="600" y1="478" x2="600" y2="582"/>
-      <line x1="660" y1="477" x2="660" y2="582"/>
       <line x1="720" y1="420" x2="720" y2="582"/>
-      <line x1="780" y1="477" x2="780" y2="582"/>
-      <line x1="840" y1="478" x2="840" y2="582"/>
-      <line x1="900" y1="477" x2="900" y2="582"/>
-      <line x1="960" y1="472" x2="960" y2="582"/>
-      <line x1="1020" y1="465" x2="1020" y2="582"/>
-      <line x1="1080" y1="455" x2="1080" y2="582"/>
       <line x1="1136" y1="440" x2="1136" y2="582"/>
-      <line x1="1190" y1="490" x2="1190" y2="582"/>
-      <line x1="1240" y1="515" x2="1240" y2="582"/>
     </g>
-
-    <!-- Scan line effect -->
-    <rect class="scan-line" x="-200" y="0" width="150" height="800"
-          fill="url(#skyGrad)" opacity="0.05"
-          style="animation-delay:3s"/>
-
-    <!-- Corner text watermark -->
-    <text x="30" y="780" font-family="monospace" font-size="11" 
-          fill="#1C7293" opacity="0.4">
+    <text x="30" y="780" font-family="monospace" font-size="11" fill="#1C7293" opacity="0.4">
       NORTHRIDGE 1994 · 2,008 BRIDGES · LOSS ASSESSMENT
     </text>
   </svg>
 </div>
 """
 
-# ── Custom CSS ─────────────────────────────────────────────────
 st.markdown("""
 <style>
-    /* Animated background */
-    .stApp {
-        background: 
-            linear-gradient(135deg, rgba(15,23,42,0.97) 0%, rgba(30,41,59,0.95) 50%, rgba(15,23,42,0.97) 100%),
-            url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/GoldenGateBridge-001.jpg/1280px-GoldenGateBridge-001.jpg');
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        color: #E2E8F0;
-    }
-
-    /* Sidebar */
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #065A82 0%, #021B2E 100%);
-        border-right: 1px solid #1C7293;
-    }
-    [data-testid="stSidebar"] * {
-        color: #E2E8F0 !important;
-    }
-
-    /* KPI Cards */
-    [data-testid="metric-container"] {
-        background: linear-gradient(135deg, #1E293B, #0F2744);
-        border: 1px solid #1C7293;
-        border-radius: 12px;
-        padding: 16px;
-        box-shadow: 0 4px 15px rgba(28, 114, 147, 0.2);
-    }
-    [data-testid="metric-container"] label {
-        color: #94A3B8 !important;
-        font-size: 0.85rem !important;
-        font-weight: 600 !important;
-        letter-spacing: 0.05em !important;
-        text-transform: uppercase !important;
-    }
-    [data-testid="metric-container"] [data-testid="stMetricValue"] {
-        color: #38BDF8 !important;
-        font-size: 1.8rem !important;
-        font-weight: 700 !important;
-    }
-    [data-testid="metric-container"] [data-testid="stMetricDelta"] {
-        color: #94A3B8 !important;
-    }
-
-    /* Section headers */
+    .stApp { background: linear-gradient(135deg, rgba(15,23,42,0.97) 0%, rgba(30,41,59,0.95) 50%, rgba(15,23,42,0.97) 100%); color: #E2E8F0; }
+    [data-testid="stSidebar"] { background: linear-gradient(180deg, #065A82 0%, #021B2E 100%); border-right: 1px solid #1C7293; }
+    [data-testid="stSidebar"] * { color: #E2E8F0 !important; }
+    [data-testid="metric-container"] { background: linear-gradient(135deg, #1E293B, #0F2744); border: 1px solid #1C7293; border-radius: 12px; padding: 16px; }
+    [data-testid="metric-container"] label { color: #94A3B8 !important; font-size: 0.85rem !important; font-weight: 600 !important; text-transform: uppercase !important; }
+    [data-testid="metric-container"] [data-testid="stMetricValue"] { color: #38BDF8 !important; font-size: 1.8rem !important; font-weight: 700 !important; }
     h1 { color: #F1F5F9 !important; font-weight: 800 !important; }
-    h2 { color: #E2E8F0 !important; font-weight: 700 !important; }
-    h3 { color: #CBD5E1 !important; font-weight: 600 !important; }
-
-    /* Divider */
+    h2 { color: #E2E8F0 !important; } h3 { color: #CBD5E1 !important; }
     hr { border-color: #1C7293 !important; opacity: 0.4; }
-
-    /* Dataframe */
-    [data-testid="stDataFrame"] {
-        border: 1px solid #1C7293;
-        border-radius: 8px;
-    }
-
-    /* Selectbox and radio */
-    [data-testid="stSelectbox"] > div,
-    [data-testid="stRadio"] > div {
-        background: #1E293B;
-        border-radius: 8px;
-        border: 1px solid #1C7293;
-    }
-
-    /* Download button */
-    [data-testid="stDownloadButton"] button {
-        background: linear-gradient(135deg, #065A82, #1C7293) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-        padding: 0.5rem 1.5rem !important;
-        box-shadow: 0 4px 12px rgba(28, 114, 147, 0.3) !important;
-    }
-    [data-testid="stDownloadButton"] button:hover {
-        background: linear-gradient(135deg, #1C7293, #065A82) !important;
-        transform: translateY(-1px) !important;
-        box-shadow: 0 6px 16px rgba(28, 114, 147, 0.4) !important;
-    }
-
-    /* Multiselect */
-    [data-testid="stMultiSelect"] > div {
-        background: #1E293B;
-        border: 1px solid #1C7293;
-        border-radius: 8px;
-    }
-
-    /* Caption / footer text */
-    .stCaption { color: #475569 !important; }
-
-    /* Background video overlay */
-    #bg-video-container {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        z-index: -1;
-        overflow: hidden;
-    }
-    #bg-video-container video {
-        min-width: 100%; min-height: 100%;
-        width: auto; height: auto;
-        position: absolute;
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-        opacity: 0.08;
-        filter: grayscale(80%) brightness(0.4);
-    }
-
-    /* Info boxes */
-    .stAlert {
-        background: #1E293B !important;
-        border: 1px solid #1C7293 !important;
-        border-radius: 8px !important;
-    }
-
-    /* Plotly chart backgrounds */
-    .js-plotly-plot {
-        border-radius: 12px;
-        overflow: hidden;
-    }
-
-    /* Tab styling */
-    .stTabs [data-baseweb="tab-list"] {
-        background: #1E293B;
-        border-radius: 8px;
-        border: 1px solid #1C7293;
-    }
-    .stTabs [data-baseweb="tab"] {
-        color: #94A3B8 !important;
-    }
-    .stTabs [aria-selected="true"] {
-        color: #38BDF8 !important;
-        background: #065A82 !important;
-        border-radius: 6px !important;
-    }
-
-    /* Number input */
-    input[type="number"] {
-        background: #1E293B !important;
-        color: #E2E8F0 !important;
-        border: 1px solid #1C7293 !important;
-        border-radius: 6px !important;
-    }
+    .stTabs [data-baseweb="tab-list"] { background: #1E293B; border-radius: 8px; border: 1px solid #1C7293; }
+    .stTabs [aria-selected="true"] { color: #38BDF8 !important; background: #065A82 !important; border-radius: 6px !important; }
 </style>
 """, unsafe_allow_html=True)
-
-# Plotly settings inlined per chart
 
 # ── Load data ──────────────────────────────────────────────────
 @st.cache_data
@@ -318,88 +109,60 @@ def load_data():
     return sm, gmpe
 
 sm_df, gmpe_df = load_data()
-
-# Inject bridge background
 st.markdown(BRIDGE_BG, unsafe_allow_html=True)
 
-# ── Colour map ──────────────────────────────────────────────────
-DS_COLORS = {
-    "none"     : "#64748B",
-    "slight"   : "#EAB308",
-    "moderate" : "#F97316",
-    "extensive": "#EF4444",
-    "complete" : "#7F1D1D",
-}
-DS_ORDER = ["none", "slight", "moderate", "extensive", "complete"]
+DS_COLORS = {"none":"#64748B","slight":"#EAB308","moderate":"#F97316","extensive":"#EF4444","complete":"#7F1D1D"}
+DS_ORDER  = ["none","slight","moderate","extensive","complete"]
 
-# ── Sidebar ─────────────────────────────────────────────────────
+# ── Sidebar ────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("""
     <div style='text-align:center; padding: 1rem 0;'>
         <div style='font-size:2.5rem;'>🌉</div>
-        <div style='font-size:1.1rem; font-weight:800; color:#F1F5F9; 
-                    letter-spacing:0.05em;'>LOSS ASSESSMENT</div>
-        <div style='font-size:0.75rem; color:#94A3B8; margin-top:4px;'>
-            Northridge 1994 · 2,008 Bridges
-        </div>
+        <div style='font-size:1.1rem; font-weight:800; color:#F1F5F9;'>LOSS ASSESSMENT</div>
+        <div style='font-size:0.75rem; color:#94A3B8; margin-top:4px;'>Northridge 1994 · 2,008 Bridges</div>
     </div>
-    <hr style='border-color:#1C7293; opacity:0.4; margin:0.5rem 0;'/>
+    <hr style='border-color:#1C7293; opacity:0.4;'/>
     """, unsafe_allow_html=True)
 
     mode = st.radio("**Select Hazard Input**", ["ShakeMap", "GMPE"])
-
     if mode == "GMPE":
-        gmpe_model = st.selectbox("**GMPE Model**", ["ASK14", "BSSA14", "CB14", "CY14"])
-
-    st.markdown("<hr style='border-color:#1C7293; opacity:0.4;'/>", unsafe_allow_html=True)
+        gmpe_model = st.selectbox("**GMPE Model**", ["ASK14","BSSA14","CB14","CY14"])
 
     st.markdown("**Fragility Parameters**")
     st.markdown("""
-    <div style='background:rgba(6,90,130,0.3); border:1px solid #1C7293; 
-                border-radius:8px; padding:10px; font-size:0.9rem;'>
-        k = 2.07 &nbsp;·&nbsp; Calibrated<br>
+    <div style='background:rgba(6,90,130,0.3); border:1px solid #1C7293; border-radius:8px; padding:10px; font-size:0.9rem;'>
+        k = 2.07 · Calibrated<br>
         <span style='color:#94A3B8; font-size:0.8rem;'>HAZUS lognormal fragility model</span>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("<hr style='border-color:#1C7293; opacity:0.4;'/>", unsafe_allow_html=True)
+    </div>""", unsafe_allow_html=True)
 
     st.markdown("**HAZUS Damage Ratios**")
     st.markdown("""
-    <div style='background:rgba(6,90,130,0.2); border-radius:8px; 
-                padding:10px; font-size:0.85rem; line-height:1.8;'>
-        🟡 Slight &nbsp;&nbsp;&nbsp; 3%<br>
-        🟠 Moderate &nbsp; 8%<br>
-        🔴 Extensive &nbsp; 25%<br>
-        🔴 Complete &nbsp; 100%
-    </div>
-    """, unsafe_allow_html=True)
+    <div style='background:rgba(6,90,130,0.2); border-radius:8px; padding:10px; font-size:0.85rem; line-height:1.8;'>
+        🟡 Slight &nbsp; 3%<br>🟠 Moderate &nbsp; 8%<br>🔴 Extensive &nbsp; 25%<br>🔴 Complete &nbsp; 100%
+    </div>""", unsafe_allow_html=True)
 
-    st.markdown("<hr style='border-color:#1C7293; opacity:0.4;'/>", unsafe_allow_html=True)
     st.markdown("""
+    <hr/>
     <div style='font-size:0.75rem; color:#475569; text-align:center;'>
-        CAT411 Capstone · Lehigh University<br>
-        Spring 2026 · Anik Das
-    </div>
-    """, unsafe_allow_html=True)
+        CAT411 Capstone · Lehigh University<br>Spring 2026 · Anik Das
+    </div>""", unsafe_allow_html=True)
 
-# ── Select active dataset ───────────────────────────────────────
+# ── Active dataset ─────────────────────────────────────────────
 if mode == "ShakeMap":
     active = sm_df.copy()
-    active['sa1s_display'] = active['sa1s_shakemap']
+    active["sa1s_display"] = active["sa1s_shakemap"]
     hazard_label = "ShakeMap Sa(1.0s)"
     title_label  = "ShakeMap"
-    title_color  = "#38BDF8"
 else:
-    active = gmpe_df[gmpe_df['gmpe_model'] == gmpe_model].copy()
-    active['sa1s_display'] = active['sa1s_used']
+    active = gmpe_df[gmpe_df["gmpe_model"] == gmpe_model].copy()
+    active["sa1s_display"] = active["sa1s_used"]
     hazard_label = f"{gmpe_model} Sa(1.0s)"
     title_label  = f"GMPE — {gmpe_model}"
-    title_color  = "#A78BFA"
 
-active['ds_color'] = active['predicted_ds'].map(DS_COLORS)
+active["ds_color"] = active["predicted_ds"].map(DS_COLORS)
 
-# ── Header ───────────────────────────────────────────────────────
+# ── Header ─────────────────────────────────────────────────────
 st.markdown(f"""
 <div style='padding: 1.5rem 0 0.5rem 0;'>
     <h1 style='margin:0; font-size:2.2rem; background: linear-gradient(90deg, #38BDF8, #818CF8);
@@ -407,70 +170,171 @@ st.markdown(f"""
         Bridge Loss Assessment — {title_label}
     </h1>
     <p style='color:#64748B; margin:4px 0 0 0; font-size:0.9rem;'>
-        Northridge 1994 Earthquake &nbsp;·&nbsp; {len(active):,} bridges &nbsp;·&nbsp; 
-        Calibrated HAZUS fragility (k=2.07)
+        Northridge 1994 Earthquake · {len(active):,} bridges · Calibrated HAZUS fragility (k=2.07)
     </p>
 </div>
-<hr style='border-color:#1C7293; opacity:0.3; margin:0.8rem 0;'/>
+<hr style='border-color:#1C7293; opacity:0.3;'/>
 """, unsafe_allow_html=True)
 
-# ── KPI Cards ────────────────────────────────────────────────────
-total_cost   = active['repair_cost_usd'].sum()
-damaged      = active[active['predicted_ds'] != 'none']
-n_damaged    = len(damaged)
-avg_cost     = damaged['repair_cost_usd'].mean() if n_damaged > 0 else 0
-max_row      = active.loc[active['repair_cost_usd'].idxmax()]
-total_rcv    = active['replacement_cost_usd'].sum()
+# ── KPI Cards ──────────────────────────────────────────────────
+total_cost = active["repair_cost_usd"].sum()
+damaged    = active[active["predicted_ds"] != "none"]
+n_damaged  = len(damaged)
+avg_cost   = damaged["repair_cost_usd"].mean() if n_damaged > 0 else 0
+max_row    = active.loc[active["repair_cost_usd"].idxmax()]
 
-k1, k2, k3, k4, k5 = st.columns(5)
-k1.metric("Total Repair Cost",      f"${total_cost/1e6:.1f}M")
-k2.metric("Bridges with Damage",    f"{n_damaged:,}")
-k3.metric("% Damaged",              f"{n_damaged/len(active)*100:.1f}%")
-k4.metric("Avg Cost (damaged)",     f"${avg_cost/1e3:.0f}K")
-k5.metric("Costliest Bridge",       f"${max_row['repair_cost_usd']/1e6:.1f}M",
-           delta=str(max_row['structure_number']), delta_color="off")
+k1,k2,k3,k4,k5 = st.columns(5)
+k1.metric("Total Repair Cost",   f"${total_cost/1e6:.1f}M")
+k2.metric("Bridges with Damage", f"{n_damaged:,}")
+k3.metric("% Damaged",           f"{n_damaged/len(active)*100:.1f}%")
+k4.metric("Avg Cost (damaged)",  f"${avg_cost/1e3:.0f}K")
+k5.metric("Costliest Bridge",    f"${max_row['repair_cost_usd']/1e6:.1f}M",
+           delta=str(max_row["structure_number"]), delta_color="off")
 
-st.markdown("<hr style='border-color:#1C7293; opacity:0.2; margin:0.8rem 0;'/>",
-            unsafe_allow_html=True)
+st.markdown("<hr style='border-color:#1C7293; opacity:0.2;'/>", unsafe_allow_html=True)
 
-# ── Map + Distribution ──────────────────────────────────────────
+# ── Map + Distribution ─────────────────────────────────────────
 col_map, col_dist = st.columns([3, 2])
 
 with col_map:
-    st.markdown("### 🗺 Bridge Locations — Predicted Damage State")
-    fig_map = px.scatter_mapbox(
-        active, lat="latitude", lon="longitude",
-        color="predicted_ds",
-        color_discrete_map=DS_COLORS,
-        category_orders={"predicted_ds": DS_ORDER},
-        hover_name="structure_number",
-        hover_data={"predicted_ds":True,"year_built":True,"hwb_class":True,
-                    "sa1s_display":":.3f","repair_cost_usd":":,.0f",
-                    "replacement_cost_usd":":,.0f",
-                    "latitude":False,"longitude":False},
-        labels={"predicted_ds":"Damage State","sa1s_display":hazard_label,
-                "repair_cost_usd":"Repair Cost ($)",
-                "replacement_cost_usd":"Replacement Cost ($)"},
-        zoom=9, center={"lat":34.2,"lon":-118.5},
-        mapbox_style="carto-darkmatter",
-        height=480,
+    # Toggle between standard and bull's-eye map
+    map_mode = st.radio(
+        "**Map View**",
+        ["📍 Predicted Damage", "🎯 Prediction vs Observed"],
+        horizontal=True,
+        key="map_toggle"
     )
-    fig_map.update_layout(
-        margin={"r":0,"t":0,"l":0,"b":0},
-        legend_title_text="Damage State",
-        paper_bgcolor="rgba(0,0,0,0)",
-        legend=dict(bgcolor="rgba(15,23,42,0.8)",
-                    bordercolor="#1C7293", borderwidth=1,
-                    font=dict(color="#E2E8F0"))
-    )
-    st.plotly_chart(fig_map, use_container_width=True)
+
+    if map_mode == "📍 Predicted Damage":
+        # ── Standard map (original) ───────────────────────────────
+        st.markdown("### 🗺 Bridge Locations — Predicted Damage State")
+        fig_map = px.scatter_mapbox(
+            active, lat="latitude", lon="longitude",
+            color="predicted_ds",
+            color_discrete_map=DS_COLORS,
+            category_orders={"predicted_ds": DS_ORDER},
+            hover_name="structure_number",
+            hover_data={"predicted_ds":True,"year_built":True,"hwb_class":True,
+                        "sa1s_display":":.3f","repair_cost_usd":":,.0f",
+                        "replacement_cost_usd":":,.0f",
+                        "latitude":False,"longitude":False},
+            labels={"predicted_ds":"Damage State","sa1s_display":hazard_label,
+                    "repair_cost_usd":"Repair Cost ($)","replacement_cost_usd":"Replacement Cost ($)"},
+            zoom=9, center={"lat":34.2,"lon":-118.5},
+            mapbox_style="carto-darkmatter", height=480,
+        )
+        fig_map.update_layout(
+            margin={"r":0,"t":0,"l":0,"b":0},
+            legend_title_text="Damage State",
+            paper_bgcolor="rgba(0,0,0,0)",
+            legend=dict(bgcolor="rgba(15,23,42,0.8)", bordercolor="#1C7293",
+                        borderwidth=1, font=dict(color="#E2E8F0"))
+        )
+        st.plotly_chart(fig_map, use_container_width=True)
+
+    else:
+        # ── Bull's-Eye Mismatch Map ───────────────────────────────
+        st.markdown("### 🎯 Prediction vs Observed — Mismatch Map")
+        st.caption("Outer ring size = magnitude of mismatch · Inner dot color = observed damage state")
+
+        ds_idx_map = {ds:i for i,ds in enumerate(DS_ORDER)}
+        plot_df = active.copy()
+        plot_df["obs_clean"] = plot_df["obs"].str.lower().str.strip()
+        plot_df["obs_idx"]   = plot_df["obs_clean"].map(ds_idx_map)
+        plot_df["pred_idx"]  = plot_df["predicted_ds"].map(ds_idx_map)
+        plot_df["gap"]       = plot_df["pred_idx"] - plot_df["obs_idx"]
+        plot_df["match_type"] = plot_df["gap"].apply(
+            lambda g: "✅ Match" if g == 0
+                      else ("🔺 Overpredicted" if g > 0 else "🔻 Underpredicted")
+        )
+
+        MISMATCH_COLORS = {
+            "✅ Match"         : "#64748B",
+            "🔺 Overpredicted" : "#38BDF8",
+            "🔻 Underpredicted": "#EF4444",
+        }
+        MISMATCH_ORDER = ["✅ Match", "🔺 Overpredicted", "🔻 Underpredicted"]
+
+        # Outer ring size scales with gap magnitude
+        plot_df["outer_size"] = (plot_df["gap"].abs() * 7 + 8).clip(upper=32)
+
+        fig_bull = go.Figure()
+
+        # Layer 1 — outer ring (mismatch type & magnitude)
+        for mtype in MISMATCH_ORDER:
+            sub = plot_df[plot_df["match_type"] == mtype]
+            fig_bull.add_trace(go.Scattermapbox(
+                lat=sub["latitude"], lon=sub["longitude"],
+                mode="markers",
+                marker=dict(
+                    size=sub["outer_size"],
+                    color=MISMATCH_COLORS[mtype],
+                    opacity=0.40,
+                ),
+                name=mtype,
+                hoverinfo="skip",
+                showlegend=True,
+            ))
+
+        # Layer 2 — inner dot (observed DS color)
+        for mtype in MISMATCH_ORDER:
+            sub = plot_df[plot_df["match_type"] == mtype]
+            fig_bull.add_trace(go.Scattermapbox(
+                lat=sub["latitude"], lon=sub["longitude"],
+                mode="markers",
+                marker=dict(
+                    size=6,
+                    color=[DS_COLORS.get(d, "#64748B") for d in sub["obs_clean"]],
+                    opacity=0.95,
+                ),
+                customdata=sub[["structure_number","obs_clean","predicted_ds",
+                                "year_built","hwb_class","repair_cost_usd","gap"]].values,
+                hovertemplate=(
+                    "<b>Bridge %{customdata[0]}</b><br>"
+                    "─────────────────<br>"
+                    "Observed DS : <b>%{customdata[1]}</b><br>"
+                    "Predicted DS: <b>%{customdata[2]}</b><br>"
+                    "DS Gap      : %{customdata[6]:+d} states<br>"
+                    "─────────────────<br>"
+                    "Year Built  : %{customdata[3]}<br>"
+                    "HWB Class   : %{customdata[4]}<br>"
+                    "Repair Cost : $%{customdata[5]:,.0f}"
+                    "<extra></extra>"
+                ),
+                showlegend=False,
+            ))
+
+        fig_bull.update_layout(
+            mapbox_style="carto-darkmatter",
+            mapbox_zoom=9,
+            mapbox_center={"lat":34.2,"lon":-118.5},
+            margin={"r":0,"t":0,"l":0,"b":0},
+            height=440,
+            paper_bgcolor="rgba(0,0,0,0)",
+            legend=dict(
+                title="Prediction Match",
+                bgcolor="rgba(15,23,42,0.85)",
+                bordercolor="#1C7293", borderwidth=1,
+                font=dict(color="#E2E8F0"),
+                x=0.01, y=0.99,
+            )
+        )
+        st.plotly_chart(fig_bull, use_container_width=True)
+
+        # Summary mini-metrics below map
+        n_match = (plot_df["gap"] == 0).sum()
+        n_over  = (plot_df["gap"] >  0).sum()
+        n_under = (plot_df["gap"] <  0).sum()
+        m1, m2, m3 = st.columns(3)
+        m1.metric("✅ Exact Match",    f"{n_match:,}", f"{n_match/len(plot_df)*100:.1f}%")
+        m2.metric("🔺 Overpredicted",  f"{n_over:,}",  f"{n_over/len(plot_df)*100:.1f}%",  delta_color="off")
+        m3.metric("🔻 Underpredicted", f"{n_under:,}", f"{n_under/len(plot_df)*100:.1f}%", delta_color="inverse")
 
 with col_dist:
     st.markdown("### 📊 Damage State Distribution")
-    obs_counts  = active['obs'].str.lower().value_counts().reindex(DS_ORDER, fill_value=0)
-    pred_counts = active['predicted_ds'].value_counts().reindex(DS_ORDER, fill_value=0)
+    obs_counts  = active["obs"].str.lower().value_counts().reindex(DS_ORDER, fill_value=0)
+    pred_counts = active["predicted_ds"].value_counts().reindex(DS_ORDER, fill_value=0)
     n = len(active)
-
     fig_dist = go.Figure()
     fig_dist.add_trace(go.Bar(
         name="Observed",
@@ -487,21 +351,16 @@ with col_dist:
         marker_line_color="#0EA5E9", marker_line_width=1
     ))
     fig_dist.update_layout(
-        paper_bgcolor="rgba(15,23,42,0)",
-        plot_bgcolor="rgba(30,41,59,0.6)",
-        font=dict(color="#E2E8F0"),
-        barmode="group", height=210,
-        yaxis_title="% of Bridges",
-        xaxis_gridcolor="#1E3A5F",
-        yaxis_gridcolor="#1E3A5F",
-        legend=dict(orientation="h", y=1.12, bgcolor="rgba(0,0,0,0)",
-                    font=dict(color="#E2E8F0")),
+        paper_bgcolor="rgba(15,23,42,0)", plot_bgcolor="rgba(30,41,59,0.6)",
+        font=dict(color="#E2E8F0"), barmode="group", height=210,
+        yaxis_title="% of Bridges", xaxis_gridcolor="#1E3A5F", yaxis_gridcolor="#1E3A5F",
+        legend=dict(orientation="h", y=1.12, bgcolor="rgba(0,0,0,0)", font=dict(color="#E2E8F0")),
         margin=dict(t=10,b=40,l=50,r=10)
     )
     st.plotly_chart(fig_dist, use_container_width=True)
 
     st.markdown("### 💰 Repair Cost by Damage State")
-    cost_by_ds = active.groupby('predicted_ds')['repair_cost_usd'].sum().reindex(DS_ORDER, fill_value=0)
+    cost_by_ds = active.groupby("predicted_ds")["repair_cost_usd"].sum().reindex(DS_ORDER, fill_value=0)
     fig_cost = go.Figure(go.Bar(
         x=[d.capitalize() for d in DS_ORDER],
         y=[cost_by_ds[ds]/1e6 for ds in DS_ORDER],
@@ -511,55 +370,45 @@ with col_dist:
         textposition="outside", textfont=dict(color="#E2E8F0", size=11)
     ))
     fig_cost.update_layout(
-        paper_bgcolor="rgba(15,23,42,0)",
-        plot_bgcolor="rgba(30,41,59,0.6)",
-        font=dict(color="#E2E8F0"),
-        height=200, yaxis_title="Repair Cost ($M)",
-        xaxis_gridcolor="#1E3A5F",
-        yaxis_gridcolor="#1E3A5F",
+        paper_bgcolor="rgba(15,23,42,0)", plot_bgcolor="rgba(30,41,59,0.6)",
+        font=dict(color="#E2E8F0"), height=200, yaxis_title="Repair Cost ($M)",
+        xaxis_gridcolor="#1E3A5F", yaxis_gridcolor="#1E3A5F",
         margin=dict(t=10,b=40,l=50,r=10), showlegend=False
     )
     st.plotly_chart(fig_cost, use_container_width=True)
 
-# ── Top 10 + Scatter ────────────────────────────────────────────
+# ── Top 10 + Scatter ───────────────────────────────────────────
 st.markdown("<hr style='border-color:#1C7293; opacity:0.2;'/>", unsafe_allow_html=True)
 col_top, col_scatter = st.columns([2, 3])
 
 with col_top:
     st.markdown("### 🏆 Top 10 Costliest Bridges")
-    top10 = (active[active['repair_cost_usd'] > 0]
-             .nlargest(10, 'repair_cost_usd')
-             [['structure_number','hwb_class','year_built','predicted_ds','repair_cost_usd']]
+    top10 = (active[active["repair_cost_usd"] > 0]
+             .nlargest(10, "repair_cost_usd")
+             [["structure_number","hwb_class","year_built","predicted_ds","repair_cost_usd"]]
              .copy())
-    top10['repair_cost_usd'] = top10['repair_cost_usd'].apply(lambda x: f"${x:,.0f}")
-    top10.columns = ['Bridge ID','HWB','Year','Damage State','Repair Cost']
+    top10["repair_cost_usd"] = top10["repair_cost_usd"].apply(lambda x: f"${x:,.0f}")
+    top10.columns = ["Bridge ID","HWB","Year","Damage State","Repair Cost"]
     st.dataframe(top10, hide_index=True, use_container_width=True)
 
 with col_scatter:
-    st.markdown(f"### 📈 Sa(1.0s) vs Repair Cost")
+    st.markdown("### 📈 Sa(1.0s) vs Repair Cost")
     fig_sc = px.scatter(
         active, x="sa1s_display", y="repair_cost_usd",
-        color="predicted_ds",
-        color_discrete_map=DS_COLORS,
+        color="predicted_ds", color_discrete_map=DS_COLORS,
         category_orders={"predicted_ds": DS_ORDER},
         hover_name="structure_number",
-        labels={"sa1s_display":hazard_label,"repair_cost_usd":"Repair Cost ($)",
-                "predicted_ds":"Damage State"},
-        height=300, opacity=0.75,
-        template="plotly_dark"
+        labels={"sa1s_display":hazard_label,"repair_cost_usd":"Repair Cost ($)","predicted_ds":"Damage State"},
+        height=300, opacity=0.75, template="plotly_dark"
     )
     fig_sc.update_layout(
-        paper_bgcolor="rgba(15,23,42,0)",
-        plot_bgcolor="rgba(30,41,59,0.6)",
-        font=dict(color="#E2E8F0"),
-        xaxis_gridcolor="#1E3A5F",
-        yaxis_gridcolor="#1E3A5F",
-        margin=dict(t=10,b=40,l=60,r=10),
-        legend_title_text="Damage State"
+        paper_bgcolor="rgba(15,23,42,0)", plot_bgcolor="rgba(30,41,59,0.6)",
+        font=dict(color="#E2E8F0"), xaxis_gridcolor="#1E3A5F", yaxis_gridcolor="#1E3A5F",
+        margin=dict(t=10,b=40,l=60,r=10), legend_title_text="Damage State"
     )
     st.plotly_chart(fig_sc, use_container_width=True)
 
-# ── Full table ──────────────────────────────────────────────────
+# ── Full table ─────────────────────────────────────────────────
 st.markdown("<hr style='border-color:#1C7293; opacity:0.2;'/>", unsafe_allow_html=True)
 st.markdown("### 📋 Full Bridge Data Table")
 
@@ -567,24 +416,22 @@ f1, f2, f3 = st.columns(3)
 ds_filter  = f1.multiselect("Filter by Damage State",
                              [d.capitalize() for d in DS_ORDER],
                              default=[d.capitalize() for d in DS_ORDER])
-hwb_options = sorted(active['hwb_class'].dropna().unique())
 hwb_filter = f2.multiselect("Filter by HWB Class",
-                              hwb_options,
-                              default=hwb_options)
+                              sorted(active["hwb_class"].dropna().unique()),
+                              default=sorted(active["hwb_class"].dropna().unique()))
 min_cost   = f3.number_input("Min Repair Cost ($)", min_value=0, value=0, step=10000)
 
 filtered = active[
-    (active['predicted_ds'].str.capitalize().isin(ds_filter)) &
-    (active['hwb_class'].isin(hwb_filter)) &
-    (active['repair_cost_usd'] >= min_cost)
+    (active["predicted_ds"].str.capitalize().isin(ds_filter)) &
+    (active["hwb_class"].isin(hwb_filter)) &
+    (active["repair_cost_usd"] >= min_cost)
 ].copy()
 
-show_cols = ['structure_number','latitude','longitude','year_built',
-             'hwb_class','sa1s_display',
-             'predicted_ds','replacement_cost_usd','repair_cost_usd','obs']
-col_labels = {'structure_number':'Bridge ID','sa1s_display':hazard_label,
-              'predicted_ds':'Pred. DS','replacement_cost_usd':'RCV ($)',
-              'repair_cost_usd':'Repair Cost ($)','obs':'Observed DS'}
+show_cols  = ["structure_number","latitude","longitude","year_built","hwb_class",
+              "sa1s_display","predicted_ds","replacement_cost_usd","repair_cost_usd","obs"]
+col_labels = {"structure_number":"Bridge ID","sa1s_display":hazard_label,
+              "predicted_ds":"Pred. DS","replacement_cost_usd":"RCV ($)",
+              "repair_cost_usd":"Repair Cost ($)","obs":"Observed DS"}
 
 st.markdown(f"<p style='color:#64748B; font-size:0.85rem;'>Showing <b style='color:#38BDF8'>{len(filtered):,}</b> bridges</p>",
             unsafe_allow_html=True)
@@ -598,7 +445,7 @@ st.download_button(
     "text/csv"
 )
 
-# ── Footer ──────────────────────────────────────────────────────
+# ── Footer ─────────────────────────────────────────────────────
 st.markdown("""
 <hr style='border-color:#1C7293; opacity:0.2; margin-top:2rem;'/>
 <div style='text-align:center; color:#334155; font-size:0.78rem; padding:0.5rem 0;'>
